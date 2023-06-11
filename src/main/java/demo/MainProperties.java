@@ -18,20 +18,20 @@ public class MainProperties {
 	@Value("${kafka.consumer.group}")
 	private String group;
 
-	public String getProducerBootstrap() {
-		return producerBootstrap;
-	}
-
 	public String getConsumerBootstrap() {
 		return consumerBootstrap;
 	}
 
-	public String getTopics() {
-		return topics;
-	}
-
 	public String getGroup() {
 		return group;
+	}
+
+	public String getProducerBootstrap() {
+		return producerBootstrap;
+	}
+
+	public String getTopics() {
+		return topics;
 	}
 
 }

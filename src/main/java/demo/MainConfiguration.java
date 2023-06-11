@@ -24,28 +24,20 @@ public class MainConfiguration {
 	private MainProperties properties;
 
 	@Bean
-	public MainProperties properties() {
-		return properties;
-	}
-
-	@Bean
-	public KafkaTemplate<String, String> template() {
-		KafkaTemplate<String, String> template = new KafkaTemplate<>(producerFactory());
-		template.setDefaultTopic(properties.getTopics());
-		return template;
-	}
-
-	@Bean
-	public ProducerFactory<String, String> producerFactory() {
-		return new DefaultKafkaProducerFactory<>(producerConfiguration(), new StringSerializer(),
-				new StringSerializer());
-	}
-
-	@Bean
-	public Map<String, Object> producerConfiguration() {
+	public Map<String, Object> consumerConfiguration() {
 		Map<String, Object> configuration = new HashMap<>();
-		configuration.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, properties.getProducerBootstrap());
+		configuration.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, properties.getConsumerBootstrap());
+		configuration.put(ConsumerConfig.GROUP_ID_CONFIG, properties.getGroup());
+		configuration.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
+		configuration.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, "100");
+		configuration.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "15000");
 		return configuration;
+	}
+
+	@Bean
+	public ConsumerFactory<String, String> consumerFactory() {
+		return new DefaultKafkaConsumerFactory<>(consumerConfiguration(), new StringDeserializer(),
+				new StringDeserializer());
 	}
 
 	@Bean
@@ -57,20 +49,28 @@ public class MainConfiguration {
 	}
 
 	@Bean
-	public ConsumerFactory<String, String> consumerFactory() {
-		return new DefaultKafkaConsumerFactory<>(consumerConfiguration(), new StringDeserializer(),
-				new StringDeserializer());
+	public Map<String, Object> producerConfiguration() {
+		Map<String, Object> configuration = new HashMap<>();
+		configuration.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, properties.getProducerBootstrap());
+		return configuration;
 	}
 
 	@Bean
-	public Map<String, Object> consumerConfiguration() {
-		Map<String, Object> configuration = new HashMap<>();
-		configuration.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, properties.getConsumerBootstrap());
-		configuration.put(ConsumerConfig.GROUP_ID_CONFIG, properties.getGroup());
-		configuration.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
-		configuration.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, "100");
-		configuration.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "15000");
-		return configuration;
+	public ProducerFactory<String, String> producerFactory() {
+		return new DefaultKafkaProducerFactory<>(producerConfiguration(), new StringSerializer(),
+				new StringSerializer());
+	}
+
+	@Bean
+	public MainProperties properties() {
+		return properties;
+	}
+
+	@Bean
+	public KafkaTemplate<String, String> template() {
+		KafkaTemplate<String, String> template = new KafkaTemplate<>(producerFactory());
+		template.setDefaultTopic(properties.getTopics());
+		return template;
 	}
 
 }
